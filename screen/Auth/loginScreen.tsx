@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+"use client"
+
+import React, { useState } from "react"
 import {
   View,
   Text,
@@ -10,166 +12,128 @@ import {
   Dimensions,
   Platform,
   KeyboardAvoidingView,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { StatusBar } from 'expo-status-bar';
-import axios from 'axios';
-import * as Yup from 'yup';
-import { Formik } from 'formik';
+} from "react-native"
+import { LinearGradient } from "expo-linear-gradient"
+import * as Yup from "yup"
+import { Formik } from "formik"
 import Animated, {
   useAnimatedStyle,
   withRepeat,
   withSequence,
   withTiming,
   useSharedValue,
-} from 'react-native-reanimated';
-import { StackNavigationProp } from '@react-navigation/stack';
+} from "react-native-reanimated"
+import type { StackNavigationProp } from "@react-navigation/stack"
+import { useAuth } from "../../contexts/AuthContext"
 
 // Types pour la navigation
 type RootStackParamList = {
-  Login: undefined;
-  Home: undefined;
-  Register: undefined;
-  ForgotPassword: undefined;
-};
+  Login: undefined
+  Home: undefined
+  Register: undefined
+  ForgotPassword: undefined
+}
 
-type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
+type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, "Login">
 
 // Props pour le composant
 interface LoginScreenProps {
-  navigation: LoginScreenNavigationProp;
+  navigation: LoginScreenNavigationProp
 }
 
 // Interface pour les valeurs du formulaire
 interface LoginFormValues {
-  email: string;
-  password: string;
+  email: string
+  password: string
 }
 
 // Schéma de validation avec Yup
 const loginSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Adresse email invalide')
-    .required('Email requis'),
-  password: Yup.string()
-    .min(6, 'Le mot de passe doit contenir au moins 6 caractères')
-    .required('Mot de passe requis'),
-});
-
-// Configuration de l'API
-const api = axios.create({
-  baseURL: 'https://votre-api.com', // Remplacez par votre URL d'API
-  timeout: 10000,
-});
+  email: Yup.string().email("Adresse email invalide").required("Email requis"),
+  password: Yup.string().min(6, "Le mot de passe doit contenir au moins 6 caractères").required("Mot de passe requis"),
+})
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
-  // État pour gérer les messages d'erreur
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // Utiliser le contexte d'authentification
+  const { login, error: authError, clearError } = useAuth()
+
+  // État pour gérer les messages d'erreur locaux
+  const [localError, setLocalError] = useState<string | null>(null)
 
   // Valeurs pour l'animation
-  const scale = useSharedValue(0.8);
-  const opacity = useSharedValue(0);
+  const scale = useSharedValue(0.8)
+  const opacity = useSharedValue(0)
 
   // Style d'animation pour le cercle énergétique
   const energyStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
     opacity: opacity.value,
-  }));
+  }))
 
   // Animation du cercle énergétique
   React.useEffect(() => {
     scale.value = withRepeat(
-      withSequence(
-        withTiming(1.1, { duration: 2000 }),
-        withTiming(0.9, { duration: 2000 })
-      ),
+      withSequence(withTiming(1.1, { duration: 2000 }), withTiming(0.9, { duration: 2000 })),
       -1,
-      true
-    );
+      true,
+    )
     opacity.value = withRepeat(
-      withSequence(
-        withTiming(0.3, { duration: 2000 }),
-        withTiming(0.1, { duration: 2000 })
-      ),
+      withSequence(withTiming(0.3, { duration: 2000 }), withTiming(0.1, { duration: 2000 })),
       -1,
-      true
-    );
-  }, []);
+      true,
+    )
+
+    // Nettoyer les erreurs lors du montage du composant
+    clearError()
+
+    return () => {
+      // Nettoyer les erreurs lors du démontage du composant
+      clearError()
+    }
+  }, [scale, opacity, clearError])
 
   // Fonction de connexion
   const handleLogin = async (
-    values: LoginFormValues, 
-    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+    values: LoginFormValues,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void },
   ) => {
-    // Réinitialiser le message d'erreur
-    setErrorMessage(null);
+    // Réinitialiser les messages d'erreur
+    setLocalError(null)
 
     try {
-      const response = await api.post('/login', {
-        email: values.email,
-        password: values.password,
-      });
-      
-      // Connexion réussie
-      if (response.data.token) {
-        // Stocker le token, naviguer vers l'écran principal
-        // Vous devrez implémenter la logique de stockage du token
-        navigation.replace('Home');
-      } else {
-        setErrorMessage('Connexion échouée. Veuillez réessayer.');
-      }
+      await login(values.email, values.password)
+      // Connexion réussie, naviguer vers l'écran principal
+      navigation.navigate('Home');
     } catch (error: any) {
-      // Gestion des erreurs de connexion
-      setErrorMessage(
-        error.response?.data?.message || 
-        'Erreur de connexion. Veuillez vérifier vos identifiants.'
-      );
+      // L'erreur est déjà gérée par le contexte d'authentification
+      setLocalError(error.message || "Erreur de connexion. Veuillez réessayer.")
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
+
+  // Afficher l'erreur du contexte ou l'erreur locale
+  const displayError = authError || localError
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <ImageBackground
-        source={require('../assets/login-background.jpg')} // Ajustez le chemin
+        source={require("../../assets/images/login.jpg")} // Ajustez le chemin
         style={styles.backgroundImage}
       >
-        <LinearGradient
-          colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0.8)']}
-          style={styles.overlay}
-        >
+        <LinearGradient colors={["rgba(0,0,0,0.7)", "rgba(0,0,0,0.8)"]} style={styles.overlay}>
           {/* Animation du cercle énergétique */}
           <Animated.View style={[styles.energyCircle, energyStyle]} />
 
           <View style={styles.formContainer}>
             <Text style={styles.title}>Portail du Maître</Text>
-            <Text style={styles.subtitle}>
-              Entrez dans le temple avec honneur
-            </Text>
+            <Text style={styles.subtitle}>Entrez dans le temple avec honneur</Text>
 
             {/* Affichage des messages d'erreur */}
-            {errorMessage && (
-              <Text style={styles.errorMessage}>{errorMessage}</Text>
-            )}
+            {displayError && <Text style={styles.errorMessage}>{displayError}</Text>}
 
-            <Formik
-              initialValues={{ email: '', password: '' }}
-              validationSchema={loginSchema}
-              onSubmit={handleLogin}
-            >
-              {({
-                handleChange,
-                handleBlur,
-                handleSubmit,
-                values,
-                errors,
-                touched,
-                isSubmitting,
-              }) => (
+            <Formik initialValues={{ email: "", password: "" }} validationSchema={loginSchema} onSubmit={handleLogin}>
+              {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
                 <View style={styles.form}>
                   {/* Champ Email */}
                   <View style={styles.inputContainer}>
@@ -178,15 +142,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                       style={styles.input}
                       placeholder="Entrez votre email"
                       placeholderTextColor="#666"
-                      onChangeText={handleChange('email')}
-                      onBlur={handleBlur('email')}
+                      onChangeText={handleChange("email")}
+                      onBlur={handleBlur("email")}
                       value={values.email}
                       keyboardType="email-address"
                       autoCapitalize="none"
                     />
-                    {touched.email && errors.email && (
-                      <Text style={styles.errorText}>{errors.email}</Text>
-                    )}
+                    {touched.email && errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
                   </View>
 
                   {/* Champ Mot de passe */}
@@ -196,24 +158,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                       style={styles.input}
                       placeholder="Entrez votre mot de passe"
                       placeholderTextColor="#666"
-                      onChangeText={handleChange('password')}
-                      onBlur={handleBlur('password')}
+                      onChangeText={handleChange("password")}
+                      onBlur={handleBlur("password")}
                       value={values.password}
                       secureTextEntry
                     />
-                    {touched.password && errors.password && (
-                      <Text style={styles.errorText}>{errors.password}</Text>
-                    )}
+                    {touched.password && errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
                   </View>
 
                   {/* Bouton de connexion */}
-                  <TouchableOpacity
-                    style={styles.loginButton}
-                    onPress={handleSubmit}
-                    disabled={isSubmitting}
-                  >
+                  <TouchableOpacity style={styles.loginButton} onPress={() => handleSubmit()} disabled={isSubmitting}>
                     <LinearGradient
-                      colors={['#f59e0b', '#ef4444', '#f59e0b']}
+                      colors={["#f59e0b", "#ef4444", "#f59e0b"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={styles.gradientButton}
@@ -232,23 +188,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   {/* Mot de passe oublié */}
                   <TouchableOpacity
                     style={styles.forgotPasswordLink}
-                    onPress={() => navigation.navigate('ForgotPassword')}
+                    onPress={() => navigation.navigate("ForgotPassword")}
                   >
-                    <Text style={styles.forgotPasswordText}>
-                      Mot de passe oublié ?
-                    </Text>
+                    <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
                   </TouchableOpacity>
 
                   {/* Lien vers l'inscription */}
-                  <TouchableOpacity
-                    style={styles.registerLink}
-                    onPress={() => navigation.navigate('Register')}
-                  >
+                  <TouchableOpacity style={styles.registerLink} onPress={() => navigation.navigate("Register")}>
                     <Text style={styles.registerText}>
-                      Nouveau dans le temple ?{' '}
-                      <Text style={styles.registerLinkText}>
-                        Commencez votre voyage
-                      </Text>
+                      Nouveau dans le temple ? <Text style={styles.registerLinkText}>Commencez votre voyage</Text>
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -258,8 +206,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         </LinearGradient>
       </ImageBackground>
     </KeyboardAvoidingView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -267,47 +215,50 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   overlay: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 20,
   },
   energyCircle: {
-    position: 'absolute',
-    width: Dimensions.get('window').width * 2,
-    height: Dimensions.get('window').width * 2,
-    borderRadius: Dimensions.get('window').width,
-    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-    top: -Dimensions.get('window').width,
-    left: -Dimensions.get('window').width / 2,
+    position: "absolute",
+    width: Dimensions.get("window").width * 2,
+    height: Dimensions.get("window").width * 2,
+    borderRadius: Dimensions.get("window").width,
+    backgroundColor: "rgba(245, 158, 11, 0.1)",
+    top: -Dimensions.get("window").width,
+    left: -Dimensions.get("window").width / 2,
   },
   formContainer: {
-    width: '100%',
+    width: "100%",
     maxWidth: 400,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
     marginBottom: 8,
-    textShadowColor: '#f59e0b',
+    textShadowColor: "#f59e0b",
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
   },
   subtitle: {
     fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
+    color: "#999",
+    textAlign: "center",
     marginBottom: 30,
   },
   errorMessage: {
-    color: '#ef4444',
-    textAlign: 'center',
+    color: "#ef4444",
+    textAlign: "center",
     marginBottom: 15,
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
+    padding: 10,
+    borderRadius: 5,
   },
   form: {
     gap: 20,
@@ -316,61 +267,62 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    color: '#ccc',
+    color: "#ccc",
     fontSize: 14,
   },
   input: {
-    backgroundColor: 'rgba(45, 45, 45, 0.5)',
+    backgroundColor: "rgba(45, 45, 45, 0.5)",
     borderWidth: 1,
-    borderColor: '#444',
+    borderColor: "#444",
     borderRadius: 8,
     padding: 12,
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
   },
   errorText: {
-    color: '#ef4444',
+    color: "#ef4444",
     fontSize: 12,
   },
   loginButton: {
     marginTop: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderRadius: 8,
   },
   gradientButton: {
     padding: 14,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   loadingContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     gap: 8,
   },
   forgotPasswordLink: {
     marginTop: 16,
   },
   forgotPasswordText: {
-    color: '#f59e0b',
-    textAlign: 'center',
+    color: "#f59e0b",
+    textAlign: "center",
     fontSize: 14,
   },
   registerLink: {
     marginTop: 16,
   },
   registerText: {
-    color: '#999',
-    textAlign: 'center',
+    color: "#999",
+    textAlign: "center",
     fontSize: 14,
   },
   registerLinkText: {
-    color: '#f59e0b',
+    color: "#f59e0b",
   },
-});
+})
 
-export default LoginScreen;
+export default LoginScreen
+
