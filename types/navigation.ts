@@ -12,6 +12,8 @@ export type RootStackParamList = {
   Settings: undefined
   Schools: undefined
   SchoolDetail: { schoolId: string }
+  Map: undefined
+  NearbySchools: undefined
 }
 
 // Types pour chaque écran
@@ -24,6 +26,8 @@ export type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList
 export type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, "Settings">
 export type SchoolsScreenNavigationProp = StackNavigationProp<RootStackParamList, "Schools">
 export type SchoolDetailScreenNavigationProp = StackNavigationProp<RootStackParamList, "SchoolDetail">
+export type MapScreenNavigationProp = StackNavigationProp<RootStackParamList, "Map">
+export type NearbySchoolsScreenNavigationProp = StackNavigationProp<RootStackParamList, "NearbySchools">
 
 // Route props types
 export type SchoolDetailScreenRouteProp = RouteProp<RootStackParamList, "SchoolDetail">
@@ -32,4 +36,3 @@ export type SchoolDetailScreenRouteProp = RouteProp<RootStackParamList, "SchoolD
 export interface NavigationProps {
   navigation: StackNavigationProp<RootStackParamList, keyof RootStackParamList>
 }
-

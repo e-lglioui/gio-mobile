@@ -8,6 +8,11 @@ export interface Schedule {
   closingTime: string
   operatingDays: string[]
 }
+export interface Location {
+  latitude: number
+  longitude: number
+  address?: string
+}
 
 export interface Dashboard {
   studentCount: number
@@ -27,6 +32,8 @@ export interface School {
   instructors?: string[]
   students?: string[]
   martialArts?: string[]
+  location?: Location 
+  distance?: number 
 }
 
 // Create an axios instance with default config
@@ -203,6 +210,57 @@ class SchoolService {
       throw error
     }
   }
+
+// getImageUrl(imagePath: string): string {
+//   // Vérifier si l'URL est déjà complète (commence par http:// ou https://)
+//   if (imagePath && (imagePath.startsWith('http://') || imagePath.startsWith('https://'))) {
+//     return imagePath;
+//   }
+  
+//   // Sinon, construire l'URL complète
+//   const baseApiUrl = "http://172.16.9.32:3000";
+//   console.log('${baseApiUrl}/upload/images/${imagePath}')
+  
+//   return `${baseApiUrl}/upload/images/${imagePath}`;
+// }
+
+
+
+getImageUrl(imagePath: string): string
+{
+  // Handle null or undefined paths
+  if (!imagePath) {
+    console.warn("Empty image path provided")
+    return ''
+  }
+
+  try {
+    // Remove any leading slash from the image path
+    const cleanPath = imagePath.startsWith("/") ? imagePath.substring(1) : imagePath
+
+    // Check if the URL is already complete (starts with http:// or https://)
+    if (cleanPath.startsWith("http://") || cleanPath.startsWith("https://")) {
+      return cleanPath
+    }
+
+    // Extract just the filename if it's a full path like "/images/filename.jpg"
+    const filename = cleanPath.includes("/") ? cleanPath.substring(cleanPath.lastIndexOf("/") + 1) : cleanPath
+
+    // Construct the complete URL
+    const baseApiUrl = "http://172.16.9.32:3000"
+    const fullUrl = `${baseApiUrl}/upload/images/${filename}`
+
+    return fullUrl
+  } catch (error) {
+    console.error("Error formatting image URL:", error)
+    return ''
+  }
+}
+
+
+
+
+
 }
 
 export const schoolService = new SchoolService()

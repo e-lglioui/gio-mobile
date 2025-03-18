@@ -27,7 +27,8 @@ import Animated, {
 import { useRoute, useNavigation } from "@react-navigation/native"
 import type { SchoolDetailScreenRouteProp, SchoolDetailScreenNavigationProp } from "../../types/navigation"
 import { type School, schoolService } from "../../services/school.service"
-
+import SchoolImageGallery from "../../components/school-image-gallery"
+import SchoolImageViewer from "../../components/school-image-viewer"
 const SchoolDetailScreen: React.FC = () => {
   const route = useRoute<SchoolDetailScreenRouteProp>()
   const navigation = useNavigation<SchoolDetailScreenNavigationProp>()
@@ -36,7 +37,8 @@ const SchoolDetailScreen: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("info") // info, students, instructors, classes
-
+  const [imageViewerVisible, setImageViewerVisible] = useState(false)
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   // Animation values
   const scale = useSharedValue(0.95)
   const opacity = useSharedValue(0)
@@ -101,6 +103,10 @@ const SchoolDetailScreen: React.FC = () => {
   const handleScroll = (event: any) => {
     scrollY.value = event.nativeEvent.contentOffset.y
   }
+  const handleImagePress = (index: number) => {
+    setSelectedImageIndex(index)
+    setImageViewerVisible(true)
+  }
 
   // Render loading state
   if (loading) {
@@ -157,42 +163,25 @@ const SchoolDetailScreen: React.FC = () => {
         <ScrollView style={styles.scrollView} onScroll={handleScroll} scrollEventThrottle={16}>
           {/* School hero image */}
           <View style={styles.imageContainer}>
-            {school.images && school.images.length > 0 ? (
-              <ImageBackground
-                source={{ uri: school.images[0] }}
-                style={styles.heroImage}
-                defaultSource={require("../../assets/images/default-school.jpg")}
-              >
-                <LinearGradient colors={["transparent", "rgba(0,0,0,0.9)"]} style={styles.imageGradient}>
-                  <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                    <Feather name="arrow-left" size={24} color="#fff" />
-                  </TouchableOpacity>
+            <SchoolImageGallery
+              images={school.images}
+              defaultImage={require("../../assets/images/default-school.jpg")}
+              onImagePress={handleImagePress}
+            />
 
-                  <View style={styles.schoolInfoOverlay}>
-                    <Text style={styles.schoolName}>{school.name}</Text>
-                    <View style={styles.infoRow}>
-                      <Feather name="map-pin" size={14} color="#f59e0b" />
-                      <Text style={styles.schoolAddress}>{school.address}</Text>
-                    </View>
-                  </View>
-                </LinearGradient>
-              </ImageBackground>
-            ) : (
-              <View style={styles.fallbackImage}>
-                <Feather name="home" size={60} color="#f59e0b" />
-                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                  <Feather name="arrow-left" size={24} color="#fff" />
-                </TouchableOpacity>
+            <LinearGradient colors={["transparent", "rgba(0,0,0,0.9)"]} style={styles.imageGradient}>
+              <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                <Feather name="arrow-left" size={24} color="#fff" />
+              </TouchableOpacity>
 
-                <View style={styles.schoolInfoOverlay}>
-                  <Text style={styles.schoolName}>{school.name}</Text>
-                  <View style={styles.infoRow}>
-                    <Feather name="map-pin" size={14} color="#f59e0b" />
-                    <Text style={styles.schoolAddress}>{school.address}</Text>
-                  </View>
+              <View style={styles.schoolInfoOverlay}>
+                <Text style={styles.schoolName}>{school.name}</Text>
+                <View style={styles.infoRow}>
+                  <Feather name="map-pin" size={14} color="#f59e0b" />
+                  <Text style={styles.schoolAddress}>{school.address}</Text>
                 </View>
               </View>
-            )}
+            </LinearGradient>
           </View>
 
           {/* Dashboard stats */}
@@ -358,6 +347,14 @@ const SchoolDetailScreen: React.FC = () => {
           {/* Footer space */}
           <View style={styles.footer} />
         </ScrollView>
+        {school.images && school.images.length > 0 && (
+          <SchoolImageViewer
+            images={school.images}
+            initialIndex={selectedImageIndex}
+            visible={imageViewerVisible}
+            onClose={() => setImageViewerVisible(false)}
+          />
+        )}
       </LinearGradient>
     </SafeAreaView>
   )

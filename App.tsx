@@ -10,6 +10,8 @@ import SplashScreen from "./screen/Auth/SplashScreen"
 import SchoolsScreen from "./screen/schools/SchoolsScreen"
 import SchoolDetailScreen from "./screen/schools/SchoolDetailScreen"
 import ProfileScreen from "./screen/ProfileScreen"
+import MapScreen from "./screen/map-screen"
+import NearbySchoolsScreen from "./screen/nearby-schools-screen"
 import { useAuth } from "./contexts/AuthContext"
 import type { RootStackParamList } from "./types/navigation"
 
@@ -38,6 +40,8 @@ const AppNavigator = () => {
             <Stack.Screen name="Schools" component={SchoolsScreen} />
             <Stack.Screen name="SchoolDetail" component={SchoolDetailScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name = "Map"component={MapScreen} />
+            <Stack.Screen name="NearbySchools" component={NearbySchoolsScreen} />
           </>
         ) : (
           // Routes pour les utilisateurs non authentifiés

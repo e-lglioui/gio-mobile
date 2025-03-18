@@ -11,7 +11,6 @@ import {
   TextInput,
   ActivityIndicator,
   SafeAreaView,
-  Alert,
 } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 import { Feather } from "@expo/vector-icons"
@@ -30,8 +29,6 @@ const SchoolsScreen = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
- 
 
   useEffect(() => {
     const fetchSchools = async () => {
@@ -95,7 +92,7 @@ const SchoolsScreen = () => {
       <View style={styles.schoolImageContainer}>
         {item.images && item.images.length > 0 ? (
           <Image
-            source={{ uri: item.images[0] }}
+            source={{ uri: schoolService.getImageUrl(item.images[0]) }}
             style={styles.schoolImage}
             defaultSource={require("../../assets/images/default-school.jpg")}
           />
@@ -159,15 +156,19 @@ const SchoolsScreen = () => {
         </View>
 
         <View style={styles.filtersContainer}>
-         
           <TouchableOpacity style={styles.filterButton}>
             <Feather name="filter" size={16} color="#f59e0b" />
             <Text style={styles.filterText}>Filtrer</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.filterButton}>
+          <TouchableOpacity style={styles.filterButton} onPress={() => navigation.navigate("Map")}>
             <Feather name="map" size={16} color="#f59e0b" />
             <Text style={styles.filterText}>Carte</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.filterButton} onPress={() => navigation.navigate("NearbySchools")}>
+            <Feather name="navigation" size={16} color="#f59e0b" />
+            <Text style={styles.filterText}>À proximité</Text>
           </TouchableOpacity>
         </View>
 
