@@ -1,50 +1,73 @@
-# Welcome to your Expo app 👋
+# Master's Portal - Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Master's Portal est une application mobile conçue pour simplifier la gestion des écoles de Kung Fu au Maroc. Grâce à une interface conviviale, les utilisateurs peuvent rechercher des écoles, suivre leurs certifications sportives et s'inscrire à des événements.
 
-## Get started
+## 🚀 Fonctionnalités principales
 
-1. Install dependencies
+- **Géolocalisation des Écoles** : Visualisez les écoles de Kung Fu proches sur une carte interactive.
+- **Enregistrement et Connexion** : Système d'authentification sécurisé.
+- **Gestion des Certifications** : Suivez votre progression et téléchargez vos certifications.
+- **Paiements Sécurisés** : Effectuez des paiements directement via l’application.
+- **Organisation d’Événements** : Inscrivez-vous et obtenez vos tickets.
 
-   ```bash
-   npm install
-   ```
+## 🛠️ Technologies utilisées
 
-2. Start the app
+- **Framework Mobile** : Expo (React Native)
+- **Gestion de l’État** : Redux Toolkit
+- **API Mapping** : React Native Maps
+- **Géolocalisation** : Expo Location
+- **Paiements** : Stripe
+- **Notifications** : Expo Notifications
 
-   ```bash
+## 📦 Prérequis
+
+- Node.js et npm installés
+- Expo CLI installé
+- Compte Stripe pour les paiements
+
+## ⚙️ Installation
+
+1. **Cloner le dépôt** :
+    ```bash
+    git clone https://github.com/e-lglioui/gio-mobile.git
+    cd masters-portal-mobile
+    ```
+2. **Installer les dépendances** :
+    ```bash
+    npm install
+    ```
+3. **Configurer les variables d’environnement** :
+    Créez un fichier `.env` à la racine et ajoutez :
+    ```env
+    API_URL=http://localhost:3000/api
+    STRIPE_PUBLIC_KEY=your_stripe_public_key
+    MAPS_API_KEY=your_google_maps_api_key
+    ```
+4. **Lancer l’application** :
+    ```bash
     npx expo start
-   ```
+    ```
 
-In the output, you'll find options to open the app in a
+## 📧 Configuration de Stripe
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Créez un compte Stripe.
+- Récupérez votre clé publique Stripe et ajoutez-la dans le fichier `.env`.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🚀 Déploiement
 
-## Get a fresh project
-
-When you're ready, run:
-
+Pour construire une application mobile :
 ```bash
-npm run reset-project
+npx expo build:android
+npx expo build:ios
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 📝 Contribution
 
-## Learn more
+Les contributions sont les bienvenues ! N’hésitez pas à ouvrir une issue ou une pull request.
 
-To learn more about developing your project with Expo, look at the following resources:
+## 📧 Contact
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Pour toute question, contactez-nous à : elgliouif@gmail.com
 
-## Join the community
 
-Join our community of developers creating universal apps.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
