@@ -4,7 +4,7 @@ import { STORAGE_KEYS } from "../lib/supabase"
 import { authService } from "./auth.service"
 
 const apiClient = axios.create({
-  baseURL: "http://172.16.9.32:3000",
+  baseURL: "http://192.168.0.109:3000",
   timeout: 10000,
 })
 

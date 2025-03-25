@@ -4,7 +4,7 @@ import { STORAGE_KEYS } from "../lib/supabase"
 
 // Configuration de l'API
 export const apiClient = axios.create({
-  baseURL: process.env.API_BASE_URL || "http://172.16.9.32:3000",
+  baseURL: process.env.API_BASE_URL || "http://192.168.0.109:3000",
   timeout: 10000,
 })
 

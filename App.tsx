@@ -37,7 +37,7 @@ const AppNavigator = () => {
           // Routes pour les utilisateurs authentifiés
           <>
             <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Schools" component={SchoolsScreen} />
+          <Stack.Screen name="Schools" component={SchoolsScreen} />
             <Stack.Screen name="SchoolDetail" component={SchoolDetailScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name = "Map"component={MapScreen} />
@@ -46,6 +46,7 @@ const AppNavigator = () => {
         ) : (
           // Routes pour les utilisateurs non authentifiés
           <>
+            
             <Stack.Screen name="Login" component={LoginScreen} />
             <Stack.Screen name="Register" component={RegisterScreen} />
             <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />

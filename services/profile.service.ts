@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { STORAGE_KEYS } from "../lib/supabase"
 import type { Student } from "../types/student"
 
-const API_URL = "http://172.16.9.32:3000/api"
+const API_URL = "http://192.168.0.109:3000/api"
 
 class ProfileService {
   private async getAuthToken(): Promise<string | null> {

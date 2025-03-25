@@ -38,7 +38,7 @@ export interface School {
 
 // Create an axios instance with default config
 const schoolApiClient = axios.create({
-  baseURL: "http://172.16.9.32:3000",
+  baseURL: "http://192.168.0.109:3000",
   timeout: 10000,
 })
 
@@ -248,7 +248,7 @@ getImageUrl(imagePath: string): string
 
     // Construct the complete URL
     const baseApiUrl = "http://172.16.9.32:3000"
-    const fullUrl = `${baseApiUrl}/upload/images/${filename}`
+    const fullUrl = `${baseApiUrl}/upload/${filename}`
 
     return fullUrl
   } catch (error) {

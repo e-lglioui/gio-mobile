@@ -161,7 +161,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                       onChangeText={handleChange("password")}
                       onBlur={handleBlur("password")}
                       value={values.password}
-                      secureTextEntry
+                      
                     />
                     {touched.password && errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
                   </View>
